@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thoma Boudhou - Portfolio Cybersécurité & IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .cyber-text {
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        body.cyber-bg {
+            background-color: #0a0a0a;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        
+        .cyber-border {
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cyber-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            animation: scanLine 3s linear infinite;
+        }
+        
+        @keyframes scanLine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .flip-book-container {
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            margin: 0 auto;
+            position: relative;
+            perspective: 1500px;
+        }
+
+        #book-cover, #book-end {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+        }
+        #book-cover { left: 0; border-radius: 8px 0 0 8px; z-index: 100; }
+        #book-end { right: 0; border-radius: 0 8px 8px 0; }
+
+        .page {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            top: 0;
+            right: 0;
+            background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            transform-style: preserve-3d;
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            cursor: pointer;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .page.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        .page-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            backface-visibility: hidden;
+            color: #00ff88;
+        }
+
+        .front { z-index: 2; }
+        .back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #0a0a0a, #111111);
+        }
+
+        .page-number { position: absolute; bottom: 20px; font-size: 12px; color: rgba(0, 255, 136, 0.6); font-family: 'Orbitron', monospace; }
+        
+        .nav-button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.5); color: #00ff88; padding: 10px; cursor: pointer; transition: all 0.3s; font-family: 'Orbitron', monospace; z-index: 110; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+        .nav-button:hover { background: rgba(0, 255, 136, 0.2); box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+        .nav-button.prev { left: -60px; }
+        .nav-button.next { right: -60px; }
+        
+        .cyber-button { background: transparent; border: 1px solid #00ff88; color: #00ff88; padding: 12px 30px; font-family: 'Orbitron', monospace; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .cyber-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: rgba(0, 255, 136, 0.2); transition: left 0.3s; }
+        .cyber-button:hover::before { left: 100%; }
+        .cyber-button:hover { box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); transform: translateY(-2px); }
+        
+        .terminal-line-container .cursor {
+            display: inline-block;
+            background-color: #00ff88;
+            width: 10px;
+            height: 1.2em;
+            margin-left: 5px;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { from, to { background-color: transparent } 50% { background-color: #00ff88; } }
+        
+        .glitch { position: relative; color: #00ff88; }
+        .glitch::before { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; color: #ff00ff; opacity: 0.8; animation: glitch1 2s infinite; }
+        @keyframes glitch1 { 0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); } 20% { clip-path: inset(20% 0 30% 0); transform: translate(-2px, 2px); } 40% { clip-path: inset(50% 0 20% 0); transform: translate(2px, -2px); } 60% { clip-path: inset(10% 0 60% 0); transform: translate(-2px, 1px); } 80% { clip-path: inset(80% 0 5% 0); transform: translate(1px, -1px); } }
+        
+        #project-modal.hidden { display: none; }
+        .modal-backdrop { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); }
+    </style>
+</head>
+<body class="cyber-bg text-white overflow-x-hidden">
+    <div id="particles-js"></div>
+    
+    <nav class="fixed top-0 w-full cyber-bg/90 backdrop-blur-md z-50 border-b border-gray-800 cyber-border">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="text-2xl font-bold cyber-text glitch" data-text="TB.">TB.</div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#accueil" class="hover:text-green-400 transition">Accueil</a>
+                    <a href="#apropos" class="hover:text-green-400 transition">À propos</a>
+                    <a href="#competences" class="hover:text-green-400 transition">Compétences</a>
+                    <a href="#portfolio" class="hover:text-green-400 transition">Portfolio</a>
+                    <a href="#contact" class="hover:text-green-400 transition">Contact</a>
+                </div>
+                <button id="menu-toggle" class="md:hidden text-green-400 z-50">
+                    <i data-feather="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <div id="mobile-menu" class="hidden md:hidden fixed inset-0 bg-black/90 backdrop-blur-lg z-40 flex items-center justify-center">
+        <div class="flex flex-col text-center space-y-8 text-2xl">
+            <a href="#accueil" class="mobile-link hover:text-green-400 transition">Accueil</a>
+            <a href="#apropos" class="mobile-link hover:text-green-400 transition">À propos</a>
+            <a href="#competences" class="mobile-link hover:text-green-400 transition">Compétences</a>
+            <a href="#portfolio" class="mobile-link hover:text-green-400 transition">Portfolio</a>
+            <a href="#contact" class="mobile-link hover:text-green-400 transition">Contact</a>
+        </div>
+    </div>
+
+    <section id="accueil" class="min-h-screen flex items-center justify-center relative">
+        <div class="container mx-auto px-6 py-20 relative z-10">
+            <div class="text-center">
+                <div class="mb-8">
+                    <div class="w-32 h-32 mx-auto rounded-full border-2 border-green-500 p-1">
+                        <img src="Anonymous-Symbol.png" alt="Profile" class="w-full h-full rounded-full object-cover">
+                    </div>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                    <span class="cyber-text glitch" data-text="Thoma Boudhou">Thoma Boudhou</span>
+                </h1>
+                <div class="cyber-border p-6 rounded-lg max-w-2xl mx-auto mb-6 font-mono terminal-line-container">
+                    <p>$ <span id="type-whoami"></span></p>
+                    <p class="cyber-text mt-2"><span id="type-title"></span><span class="cursor"></span></p>
+                </div>
+                <p class="text-lg text-gray-300 mb-8 max-w-3xl mx-auto">
+                    Étudiant passionné par la cybersécurité et l'intelligence artificielle.
+                    Spécialisé en sécurité offensive, Machine Learning et développement.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#portfolio" class="cyber-button">Voir Portfolio</a>
+                    <a href="#contact" class="cyber-button">Contact</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="apropos" class="py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12"><span class="cyber-text">À propos</span></h2>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <p class="text-lg text-gray-300 mb-6">Étudiant en cycle ingénieur à EFREI Paris, spécialisé en cybersécurité et intelligence artificielle.</p>
+                    <p class="text-lg text-gray-300 mb-6">Recherche un stage de 5 mois pour contribuer à des projets innovants en cybersécurité et IA.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="cyber-border p-4 rounded-lg"><i data-feather="map-pin" class="w-5 h-5 text-green-400 mb-2"></i><p class="text-sm text-gray-400">Localisation</p><p class="cyber-text">Paris</p></div>
+                        <div class="cyber-border p-4 rounded-lg"><i data-feather="book" class="w-5 h-5 text-green-400 mb-2"></i><p class="text-sm text-gray-400">Formation</p><p class="cyber-text">EFREI Paris</p></div>
+                        <div class="cyber-border p-4 rounded-lg"><i data-feather="shield" class="w-5 h-5 text-green-400 mb-2"></i><p class="text-sm text-gray-400">Spécialisation</p><p class="cyber-text">Cybersécurité & IA</p></div>
+                        <div class="cyber-border p-4 rounded-lg"><i data-feather="target" class="w-5 h-5 text-green-400 mb-2"></i><p class="text-sm text-gray-400">Objectif</p><p class="cyber-text">Stage 5 mois</p></div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="cyber-border p-6 rounded-lg border-l-4 border-green-500">
+                        <h3 class="text-xl font-semibold mb-3 cyber-text">Formation</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="cyber-text">EFREI Paris – Cycle Ingénieur</p>
+                                <p class="text-sm text-gray-400">2024 – Présent</p>
+                            </div>
+                            <div>
+                                <p class="cyber-text">Concordia University, Canada</p>
+                                <p class="text-sm text-gray-400">Janvier 2025 – Mai 2025</p>
+                            </div>
+                            <div>
+                                <p class="cyber-text">Classe préparatoire MP2I</p>
+                                <p class="text-sm text-gray-400">2022 – 2024</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cyber-border p-6 rounded-lg border-l-4 border-green-500"><h3 class="text-xl font-semibold mb-3 cyber-text">Certifications</h3><ul class="space-y-2"><li class="flex items-center"><i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>Cybersecurity Essentials - CISCO</li></ul></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="competences" class="py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12"><span class="cyber-text">Compétences</span></h2>
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <div class="cyber-border p-6 rounded-xl">
+                    <div class="flex items-center mb-4"><i data-feather="code" class="w-6 h-6 text-green-400 mr-3"></i><h3 class="text-xl font-semibold cyber-text">Développement & IA</h3></div>
+                    <div class="space-y-4 text-sm">
+                        <p class="font-bold cyber-text">Python</p>
+                        <p class="text-gray-300 ml-4">TensorFlow, PyTorch, Scikit-learn, FastAPI</p>
+                        <p class="font-bold cyber-text mt-2">Web</p>
+                        <p class="text-gray-300 ml-4">JavaScript, HTML5, CSS3, React.js (notions)</p>
+                         <p class="font-bold cyber-text mt-2">Autres</p>
+                        <p class="text-gray-300 ml-4">C, OCaml, SQL, Git, Docker</p>
+                    </div>
+                </div>
+                <div class="cyber-border p-6 rounded-xl">
+                    <div class="flex items-center mb-4"><i data-feather="shield" class="w-6 h-6 text-green-400 mr-3"></i><h3 class="text-xl font-semibold cyber-text">Cybersécurité</h3></div>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start"><i data-feather="chevron-right" class="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0"></i><span>Pentest & Ethical Hacking (Web, Réseau)</span></li>
+                        <li class="flex items-start"><i data-feather="chevron-right" class="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0"></i><span>Analyse de vulnérabilités & Threat Intelligence</span></li>
+                        <li class="flex items-start"><i data-feather="chevron-right" class="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0"></i><span>Participation à des CTF (Capture The Flag)</span></li>
+                        <li class="flex items-start"><i data-feather="chevron-right" class="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0"></i><span>Outils : Burp Suite, Metasploit, Nmap, Wireshark</span></li>
+                    </ul>
+                </div>
+                <div class="cyber-border p-6 rounded-xl">
+                    <div class="flex items-center mb-4"><i data-feather="users" class="w-6 h-6 text-green-400 mr-3"></i><h3 class="text-xl font-semibold cyber-text">Soft Skills</h3></div>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start"><i data-feather="check" class="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0"></i><span>Leadership et gestion d'équipe</span></li>
+                        <li class="flex items-start"><i data-feather="check" class="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0"></i><span>Communication efficace et esprit de synthèse</span></li>
+                        <li class="flex items-start"><i data-feather="check" class="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0"></i><span>Esprit d'analyse et résolution de problèmes</span></li>
+                        <li class="flex items-start"><i data-feather="check" class="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0"></i><span>Autonomie, curiosité et initiative</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="portfolio" class="py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12"><span class="cyber-text">Portfolio Interactif</span></h2>
+            <div class="flip-book-container">
+                <button class="nav-button prev" onclick="previousPage()"><i data-feather="arrow-left"></i></button>
+                
+                <div id="book-cover">
+                     <h3 class="text-2xl font-bold font-mono">Portfolio</h3>
+                </div>
+                <div id="book-content">
+                    <!-- Les pages seront injectées ici par JavaScript -->
+                </div>
+                <div id="book-end">
+                    <div class="page-content">
+                        <h3 class="text-xl font-bold mb-4 cyber-text">Fin du Portfolio</h3>
+                        <p class="text-sm text-gray-400 mb-6">Merci pour votre visite.</p>
+                        <button onclick="goToPage(0)" class="cyber-button text-sm py-2 px-4">Retour au début</button>
+                    </div>
+                </div>
+                
+                <button class="nav-button next" onclick="nextPage()"><i data-feather="arrow-right"></i></button>
+            </div>
+            <div class="text-center mt-8">
+                <p class="text-gray-400 mb-4">Page <span id="currentPageDisplay">0</span> sur 6</p>
+                <div id="pagination-dots" class="flex justify-center gap-2"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12"><span class="cyber-text">Contact</span></h2>
+            <div class="max-w-4xl mx-auto">
+                <div class="cyber-border p-8 rounded-xl">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-6 cyber-text">Informations de contact</h3>
+                            <div class="space-y-4">
+                                <a href="mailto:thoma.boudhou@efrei.net" class="flex items-center group"><i data-feather="mail" class="w-5 h-5 text-green-400 mr-3"></i><div><p class="text-sm text-gray-400">Email</p><p class="cyber-text group-hover:text-white transition">thoma.boudhou@efrei.net</p></div></a>
+                                <a href="tel:+330764795851" class="flex items-center group"><i data-feather="phone" class="w-5 h-5 text-green-400 mr-3"></i><div><p class="text-sm text-gray-400">Téléphone</p><p class="cyber-text group-hover:text-white transition">+33 07 64 79 58 51</p></div></a>
+                                <a href="https://www.linkedin.com/in/thoma-boudhou-a4735132a/" target="_blank" class="flex items-center group"><i data-feather="linkedin" class="w-5 h-5 text-green-400 mr-3"></i><div><p class="text-sm text-gray-400">LinkedIn</p><p class="cyber-text group-hover:text-white transition">/in/thoma-boudhou</p></div></a>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-6 cyber-text">Envoyer un message</h3>
+                            <form id="contact-form" class="space-y-4">
+                                <input type="text" placeholder="Votre nom" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-lg focus:outline-none focus:border-green-500 text-white transition">
+                                <input type="email" placeholder="Votre email" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-lg focus:outline-none focus:border-green-500 text-white transition">
+                                <textarea placeholder="Votre message" rows="4" class="w-full px-4 py-3 bg-black/50 border border-green-500/30 rounded-lg focus:outline-none focus:border-green-500 text-white transition"></textarea>
+                                <button type="submit" class="cyber-button w-full">Envoyer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-8 cyber-bg border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center">
+             <p class="text-gray-500 font-mono text-sm mb-4">// End of transmission</p>
+            <p class="text-gray-400">© 2024 Thoma Boudhou</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a href="https://www.linkedin.com/in/thoma-boudhou-a4735132a/" target="_blank" class="text-gray-400 hover:text-green-400 transition"><i data-feather="linkedin" class="w-5 h-5"></i></a>
+                <a href="https://github.com" target="_blank" class="text-gray-400 hover:text-green-400 transition"><i data-feather="github" class="w-5 h-5"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="project-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-backdrop fixed inset-0" onclick="closeModal()"></div>
+        <div id="modal-content" class="cyber-border rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto z-10 p-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-2xl font-bold cyber-text"></h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition"><i data-feather="x" class="w-8 h-8"></i></button>
+            </div>
+            <div id="modal-body" class="text-gray-300"></div>
+        </div>
+    </div>
+
+    <script>
+        const pageContent = [
+            { title: "Simulation de Pentest", content: `<div class="text-left text-sm space-y-3"><p class="text-xs text-gray-400">Mise en place d’un lab d'attaque-défense pour appliquer une méthodologie de pentest complète.</p><h4 class="font-bold cyber-text text-xs uppercase pt-2">Détails Techniques :</h4><ul class="list-disc list-inside text-xs text-gray-300 space-y-1"><li>Déploiement d'un lab avec Vagrant & VMs.</li><li>Cartographie réseau (Nmap) & énumération.</li><li>Analyse de vulnérabilités web et système.</li></ul><button class="text-green-400 text-xs mt-4 hover:underline" onclick="openModal(0)">Voir plus →</button></div>` },
+            { title: "Pratique Continue CTF", content: `<div class="text-left text-sm space-y-3"><p class="text-xs text-gray-400">Résolution régulière de challenges sur des plateformes dédiées pour explorer des scénarios d’intrusion réalistes.</p><h4 class="font-bold cyber-text text-xs uppercase pt-2">Détails Techniques :</h4><ul class="list-disc list-inside text-xs text-gray-300 space-y-1"><li>Challenges Web, Pwn, Crypto, & Forensics.</li><li>Création de scripts d'automatisation (Python).</li><li>Collaboration en équipe sur des scénarios complexes.</li></ul><button class="text-green-400 text-xs mt-4 hover:underline" onclick="openModal(1)">Voir plus →</button></div>` },
+            { title: "Prédiction du Prix du Bitcoin", content: `<div class="text-left text-sm space-y-3"><p class="text-xs text-gray-400">Développement d’un modèle LSTM pour la prédiction à court terme du prix du Bitcoin.</p><h4 class="font-bold cyber-text text-xs uppercase pt-2">Détails Techniques :</h4><ul class="list-disc list-inside text-xs text-gray-300 space-y-1"><li>Préparation de séries temporelles (Pandas).</li><li>Entraînement d'un modèle LSTM (Keras/TensorFlow).</li><li>Évaluation des performances (RMSE, MAE).</li></ul><button class="text-green-400 text-xs mt-4 hover:underline" onclick="openModal(2)">Voir plus →</button></div>` },
+            { title: "Suivi de Balle de Volley", content: `<div class="text-left text-sm space-y-3"><p class="text-xs text-gray-400">Entraînement d'un CNN pour détecter, suivre et classifier la position d'une balle de volley en temps réel.</p><h4 class="font-bold cyber-text text-xs uppercase pt-2">Détails Techniques :</h4><ul class="list-disc list-inside text-xs text-gray-300 space-y-1"><li>Annotation de dataset & data augmentation.</li><li>Fine-tuning d'un modèle MobileNetV2.</li><li>Classification 'IN/OUT' en conditions réelles.</li></ul><button class="text-green-400 text-xs mt-4 hover:underline" onclick="openModal(3)">Voir plus →</button></div>` },
+            { title: "Infrastructure Proxmox", content: `<div class="text-left text-sm space-y-3"><p class="text-xs text-gray-400">Déploiement d'un mini-datacenter local pour héberger des environnements de test isolés.</p><h4 class="font-bold cyber-text text-xs uppercase pt-2">Détails Techniques :</h4><ul class="list-disc list-inside text-xs text-gray-300 space-y-1"><li>Déploiement d'un hyperviseur Proxmox VE.</li><li>Gestion de VMs et conteneurs LXC.</li><li>Segmentation réseau pour isoler les labs.</li></ul><button class="text-green-400 text-xs mt-4 hover:underline" onclick="openModal(4)">Voir plus →</button></div>` },
+            { title: "Contact", content: `<div class="space-y-3"><a href="mailto:thoma.boudhou@efrei.net" class="flex items-center text-green-400 hover:text-green-300 text-sm"><i data-feather="mail" class="w-4 h-4 mr-2"></i><span>thoma.boudhou@efrei.net</span></a><a href="https://www.linkedin.com/in/thoma-boudhou-a4735132a/" target="_blank" class="flex items-center text-green-400 hover:text-green-300 text-sm"><i data-feather="linkedin" class="w-4 h-4 mr-2"></i><span>/in/thoma-boudhou</span></a><div class="mt-4 p-3 bg-green-500/10 rounded"><p class="text-xs text-green-400">N'hésitez pas à me contacter !</p></div></div>` }
+        ];
+
+        const projectsDetails = [
+            { title: "Projet Ethical Hacking", content: "<p>Mise en place d’un environnement de pentest complet pour simuler des attaques sur une infrastructure d'entreprise. Ce projet couvre la méthodologie d'attaque (reconnaissance, scan, exploitation), l'utilisation d'outils professionnels et la rédaction de rapports de vulnérabilités.</p><h4 class='mt-4 mb-2 font-bold cyber-text'>Outils / Technologies :</h4><div class='flex flex-wrap gap-2 text-xs'><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Nmap</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>BurpSuite</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Metasploit</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Vagrant</span></div><h4 class='mt-4 mb-2 font-bold cyber-text'>Compétences acquises :</h4><p class='text-sm text-gray-300'>OSINT, cartographie réseau, énumération de services, analyse de failles web (XSS, SQLi), exploitation système, reporting technique.</p>" },
+            { title: "Pratique Continue CTF", content: "<p>Résolution régulière de challenges 'Capture The Flag' et de laboratoires interactifs pour découvrir des outils de pointe et des scénarios d'intrusion réalistes. C'est une démarche d'auto-formation continue pour rester à jour sur les menaces et techniques actuelles.</p><h4 class='mt-4 mb-2 font-bold cyber-text'>Outils / Plateformes :</h4><div class='flex flex-wrap gap-2 text-xs'><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>TryHackMe</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Root-Me</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Kali Linux</span></div><h4 class='mt-4 mb-2 font-bold cyber-text'>Compétences acquises :</h4><p class='text-sm text-gray-300'>Gestion d'outils offensifs, pentest guidé, renforcement de la logique offensive, automatisation de tâches avec des scripts, veille technique.</p>" },
+            { title: "Projet IA — Prédiction du prix du Bitcoin", content: "<p>Développement d’un modèle LSTM (Long Short-Term Memory) pour la prédiction du prix du Bitcoin à court terme. Le projet inclut le preprocessing des données, l'entraînement du modèle, l'optimisation des hyperparamètres et l'évaluation de ses performances sur des données historiques.</p><h4 class='mt-4 mb-2 font-bold cyber-text'>Technologies :</h4><div class='flex flex-wrap gap-2 text-xs'><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Python</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Pandas</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Keras/TensorFlow</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Matplotlib</span></div><h4 class='mt-4 mb-2 font-bold cyber-text'>Compétences acquises :</h4><p class='text-sm text-gray-300'>Feature engineering, traitement de séries temporelles, deep learning (RNN), tuning d’hyperparamètres, visualisation de résultats.</p>" },
+            { title: "Projet Computer Vision — Suivi de balle de volley", content: "<p>Utilisation d'un réseau de neurones convolutifs (CNN) pour la détection et le suivi de la trajectoire d’une balle de volley dans des vidéos. Le modèle est également capable de classifier si la balle atterrit 'IN' ou 'OUT' de la ligne, avec une évaluation précise via la F1-score.</p><h4 class='mt-4 mb-2 font-bold cyber-text'>Technologies :</h4><div class='flex flex-wrap gap-2 text-xs'><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Python</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>OpenCV</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>PyTorch/CNN</span></div><h4 class='mt-4 mb-2 font-bold cyber-text'>Compétences acquises :</h4><p class='text-sm text-gray-300'>Construction de dataset, data augmentation, entraînement de CNN, détection d'objets en temps réel, calcul des métriques de performance.</p>" },
+            { title: "Projet Cloud — Infrastructure Proxmox", content: "<p>Mise en place d’un mini-cluster local en utilisant l'hyperviseur Proxmox pour héberger des machines virtuelles, des conteneurs et des environnements de test pour des laboratoires réseau et de cybersécurité. Ce projet sert de base pour toutes mes expérimentations.</p><h4 class='mt-4 mb-2 font-bold cyber-text'>Technologies :</h4><div class='flex flex-wrap gap-2 text-xs'><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Proxmox VE</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Linux (Debian)</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Conteneurs LXC</span><span class='px-2 py-1 bg-green-500/20 text-green-400 rounded'>Réseau virtuel</span></div><h4 class='mt-4 mb-2 font-bold cyber-text'>Compétences acquises :</h4><p class='text-sm text-gray-300'>Virtualisation (KVM/QEMU), administration système, segmentation réseau, déploiement d’environnements isolés.</p>" }
+        ];
+
+        let currentFlippedPage = 0;
+        let pages = [];
+        const totalPhysicalPages = Math.ceil(pageContent.length / 2);
+
+        function initializeFlipBook() {
+            const bookContentEl = document.getElementById('book-content');
+            bookContentEl.innerHTML = '';
+            for (let i = 0; i < totalPhysicalPages; i++) {
+                const page = document.createElement('div');
+                page.className = 'page';
+                page.style.zIndex = totalPhysicalPages - i;
+
+                const backContent = pageContent[i * 2];
+                const frontContent = pageContent[i * 2 + 1];
+
+                const back = document.createElement('div');
+                back.className = 'page-content back';
+                back.innerHTML = `<h3 class="text-xl font-bold mb-4 cyber-text">${backContent.title}</h3>${backContent.content}<span class="page-number">Page ${i * 2 + 1}</span>`;
+
+                const front = document.createElement('div');
+                front.className = 'page-content front';
+                if (frontContent) {
+                    front.innerHTML = `<h3 class="text-xl font-bold mb-4 cyber-text">${frontContent.title}</h3>${frontContent.content}<span class="page-number">Page ${i * 2 + 2}</span>`;
+                }
+                
+                page.appendChild(front);
+                page.appendChild(back);
+                bookContentEl.appendChild(page);
+            }
+            pages = document.querySelectorAll('.page');
+            createPaginationDots();
+            updatePagination();
+        }
+
+        function createPaginationDots() {
+            const dotsContainer = document.getElementById('pagination-dots');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i <= totalPhysicalPages; i++) {
+                const dot = document.createElement('button');
+                dot.onclick = () => goToPage(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+        
+        function updatePagination() {
+            const totalPageCount = pageContent.length;
+            const currentPage = currentFlippedPage * 2;
+            document.getElementById('currentPageDisplay').textContent = `${currentPage} sur ${totalPageCount}`;
+            const dots = document.querySelectorAll('#pagination-dots button');
+            dots.forEach((dot, index) => {
+                dot.className = index === currentFlippedPage ? 'w-2 h-2 bg-green-500 rounded-full transition' : 'w-2 h-2 bg-gray-600 rounded-full transition hover:bg-gray-500';
+            });
+            const bookCover = document.getElementById('book-cover');
+            if (currentFlippedPage > 0) {
+                bookCover.style.opacity = '0';
+                bookCover.style.pointerEvents = 'none';
+            } else {
+                bookCover.style.opacity = '1';
+                bookCover.style.pointerEvents = 'auto';
+            }
+        }
+
+        function nextPage() {
+            if (currentFlippedPage < totalPhysicalPages) {
+                pages[currentFlippedPage].classList.add('flipped');
+                currentFlippedPage++;
+                updatePagination();
+            }
+        }
+        
+        function previousPage() {
+            if (currentFlippedPage > 0) {
+                currentFlippedPage--;
+                pages[currentFlippedPage].classList.remove('flipped');
+                updatePagination();
+            }
+        }
+
+        function goToPage(pageNum) {
+            while(currentFlippedPage < pageNum) {
+                if (pages[currentFlippedPage]) pages[currentFlippedPage].classList.add('flipped');
+                currentFlippedPage++;
+            }
+            while(currentFlippedPage > pageNum) {
+                currentFlippedPage--;
+                if (pages[currentFlippedPage]) pages[currentFlippedPage].classList.remove('flipped');
+            }
+            updatePagination();
+        }
+
+        function openModal(projectIndex) {
+            const modal = document.getElementById('project-modal');
+            const project = projectsDetails[projectIndex];
+            if (project) {
+                document.getElementById('modal-title').textContent = project.title;
+                document.getElementById('modal-body').innerHTML = project.content;
+                modal.classList.remove('hidden');
+                feather.replace();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('project-modal').classList.add('hidden');
+        }
+
+        function typeEffect(element, text, delay = 100, callback = () => {}) {
+            let i = 0; element.innerHTML = ""; function typing() { if (i < text.length) { element.innerHTML += text.charAt(i); i++; setTimeout(typing, delay); } else if (callback) { callback(); } } typing();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+
+            particlesJS('particles-js', {
+              "particles": { "number": { "value": 50, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00ff88" }, "shape": { "type": "circle" }, "opacity": { "value": 0.4, "random": true }, "size": { "value": 2, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00ff88", "opacity": 0.2, "width": 1 }, "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true, "straight": false, "out_mode": "out" } },
+              "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": false }, "resize": true }, "modes": { "repulse": { "distance": 100, "duration": 0.4 } } },
+              "retina_detect": true
+            });
+
+            const whoamiEl = document.getElementById('type-whoami');
+            const titleEl = document.getElementById('type-title');
+            typeEffect(whoamiEl, 'whoami', 100, () => {
+                typeEffect(titleEl, 'INGÉNIEUR STAGIAIRE - CYBERSÉCURITÉ | IA', 50);
+            });
+            
+            initializeFlipBook();
+
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                menuToggle.innerHTML = mobileMenu.classList.contains('hidden') ? '<i data-feather="menu" class="w-6 h-6"></i>' : '<i data-feather="x" class="w-6 h-6"></i>';
+                feather.replace();
+            });
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    menuToggle.innerHTML = '<i data-feather="menu" class="w-6 h-6"></i>';
+                    feather.replace();
+                });
+            });
+
+            document.getElementById('contact-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const button = this.querySelector('button[type="submit"]');
+                button.textContent = 'Message envoyé! ✓';
+                button.style.background = 'rgba(0, 255, 136, 0.2)';
+                setTimeout(() => {
+                    button.textContent = 'Envoyer';
+                    button.style.background = '';
+                    this.reset();
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
